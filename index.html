@@ -1,16 +1,20 @@
 <html>
 	<head>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+	
 		<script type="text/javascript" src="swfobject.js"></script> 
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
 		<link href='http://fonts.googleapis.com/css?family=Holtwood+One+SC' rel='stylesheet' type='text/css'>
     
-		<style>
+		<style type="text/css">
 			body{
 				background:#151515;
 				margin:0;
 				overflow:hidden;
 				margin:-1%;
-/*        width:1680px;*/
+			}
+			a {
+				text-decoration:none;
 			}
 			.panel{
         position:relative;
@@ -22,17 +26,15 @@
 			}
 			.panel .overlay{
 				position:absolute;
-/*        bottom:0;*/
 				width:100%;
 				max-height:20%;
 				padding:0 20px;
-				z-index:1000;
+				z-index:5;
 				background:#000;
 				opacity:.5;
 				color:#fff;
 				font-family: 'Holtwood One SC', serif;
-				font-size:40px;
-/*        background-image:url('tv-overlay-small.png');*/
+				font-size:2em;
 			}
 			.half-panel{
 			  position:relative;
@@ -60,6 +62,15 @@
         margin:-200px 0 0 -200px;
 				width:150%;
 				height:150%;
+			}
+			.fullscreen {
+    		width: 100% !important;
+    		height: 100% !important;
+    		top: 0 !important;
+    		left: 0 !important;
+    		margin: 0 !important;
+    		position: absolute !important;
+    		z-index: 100 !important;
 			}
 		</style>
 		<script type="text/javascript">
@@ -126,12 +137,102 @@
           setTimeout("animatePanel("+i+");", (speed+pause)*i);
 		    });
 		  }
+		  
+		  function checkForReload(){
+/* 		  	$.ajax(); */
+		  }
+		  
 		  $(document).ready(function(){
-        // placePanels();
+        //placePanels();
         setTimeout('location.reload();', 300000);
         // setTimeout('loopAnimations(); setInterval("loopAnimations();", (speed+pause)*4);', 5000);
         inform('setup done.');
+        
+        $('.panelAction').click(function(){
+        	var parent = $(this).parent();
+        	if(parent.hasClass('fullscreen')){
+	        	parent.removeClass('fullscreen');
+	        	playerAlJazjeera.setVolume(0);
+	        }
+	        else {
+	        	parent.addClass('fullscreen');
+	        	playerAlJazjeera.setVolume(100);
+	        }
+        });
 		  });
+		  
+		  
+		  
+			// YouTube API calls
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+      tag.src = "http://www.youtube.com/player_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var playerAlJazjeera, playerFavorites, playerVideoscapes;
+      function onYouTubePlayerAPIReady() {
+        playerAlJazjeera = new YT.Player('playerAlJazeera', {
+          height: '103%',
+          width: '100%',
+          videoId: 'oObdPuriO2w',
+          playerVars: { 'controls': 0 },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+        
+        playerFavorites = new YT.Player('playerFavorites', {
+          height: '103%',
+          width: '100%',
+          playerVars: { 'list': 'FLWOUBaELW6-_QS5BckD_Uxg', 'controls': 0, 'loop': '1' },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+        
+        playerVideoscapes = new YT.Player('playerVideoscapes', {
+          height: '103%',
+          width: '100%',
+          playerVars: { 'list': 'PL15E783FFAFE37801', 'controls': 0, 'loop': '1', 'shuffle': '1' },
+          events: {
+            'onReady': onPlaylistPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+      	event.target.setShuffle(true);
+        event.target.setVolume(0);
+				event.target.playVideo();
+      }
+      
+      function onPlaylistPlayerReady(event) {
+/*       	event.target.loadPlaylist('PL15E783FFAFE37801'); */
+
+        event.target.setVolume(0);
+				event.target.playVideo();
+      }
+			
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+
+      }
+      
+      function shuffle(o){ //v1.0
+				for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+				return o;
+			};
+
 		</script>
 	</head>
 	<body>
@@ -148,29 +249,43 @@
   			</div>
 			</div>
 			<div class="panel">
-				<div class="overlay">WORLD NEWS</div>
-        <iframe width="100%" height="110%" src="http://www.youtube.com/embed/oObdPuriO2w?autoplay=1" frameborder="0" allowfullscreen></iframe>
+				<a href="javascript:void(0);" class="panelAction"><div class="overlay">WORLD NEWS</div></a>
+				<div id="playerAlJazeera"></div>
+<!--         <iframe width="100%" height="110%" src="http://www.youtube.com/embed/oObdPuriO2w?autoplay=1" frameborder="0" allowfullscreen></iframe> -->
 			</div>
+			<div class="panel">
+				<a href="javascript:void(0);" class="panelAction"><div class="overlay">YOUTUBE</div></a>
+				<div id="playerFavorites"></div>
+			</div>
+<!--
 			<div class="panel">
 				<div class="overlay">SPACE</div>
         <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="110%" id="utv577173"><param name="flashvars" value="autoplay=true&amp;brand=embed&amp;cid=6540154&amp;v3=1"/><param name="allowfullscreen" value="true"/><param name="allowscriptaccess" value="always"/><param name="movie" value="http://www.ustream.tv/flash/viewer.swf"/><embed flashvars="autoplay=true&amp;brand=embed&amp;cid=6540154&amp;v3=1" width="100%" height="110%" allowfullscreen="true" allowscriptaccess="always" id="utv577173" name="utv_n_56845" src="http://www.ustream.tv/flash/viewer.swf" type="application/x-shockwave-flash" /></object><br /><a href="http://www.ustream.tv/" style="padding: 2px 0px 4px; width: 400px; background: #ffffff; display: block; color: #000000; font-weight: normal; font-size: 10px; text-decoration: underline; text-align: center;" target="_blank">Streaming by Ustream</a>
 			</div>
+-->
 			<div class="panel" style="margin:0%; height:49%; width:50%">
+			
+<!--
         <div class="quarter-panel">
           <div class="overlay">GOLDEN GATE</div>
           <iframe width="200%" height="200%" style="position:absolute; top:-50px; left:-180px;" src="http://www.earthcam.com/swf/cam_player_v2/ecnPlayer.swf?20110707&hidebanner=false&cam=goldengatebridge&timestamp=1316942288&json=%7B%22cam%22%3A%7B%22goldengatebridge%22%3A%7B%22bestofdomain%22%3A%22rtmp%3A%5C%2F%5C%2Fvideo2.earthcam.com%5C%2Farchives%22%2C%22bestofpath%22%3A%22%22%2C%22bestofbuffer%22%3A%225%22%2C%22bestofstarttime%22%3A%22%22%2C%22goto%22%3A%22live%22%2C%22defaulttab%22%3A%22live%22%2C%22image_rotate%22%3A%220%22%2C%22rotate%22%3A%220%22%2C%22offlineimages%22%3A%22GoldenGate2.jpg%22%2C%22is3D%22%3A%22false%22%2C%22hideIconMap%22%3A%22false%22%2C%22archiveVideoSelector%22%3A%22false%22%2C%22thumbnail%22%3A%22a276d9cc3c626a69becdf8dbc2901b69%22%2C%22page_thumbnail%22%3A%224a617c52a279736cfb69c23148962eed%22%2C%22url%22%3A%22%22%2C%22weather%22%3Anull%2C%22hidden%22%3A%22false%22%2C%22hd%22%3A%22no%22%2C%22overlay%22%3A%22true%22%2C%22overlay_archives%22%3A%22true%22%2C%22overlay_timelapse%22%3A%22true%22%2C%22id%22%3A%227c82918cc7ac089942a96a519abafbda%22%2C%22wmv_for%22%3A%22live%22%2C%22longbanner%22%3A%22%22%2C%22placeholderpath%22%3A%22%22%2C%22coords%22%3A%2237.81958640000000%2C-122.47853250000000%22%2C%22cam_counter%22%3A1%2C%22cam_state%22%3A%221%22%2C%22cam_name%22%3A%22goldengatebridge%22%2C%22group_id%22%3A%22goldengatebridge%22%2C%22group_order%22%3A%221%22%2C%22default_cam%22%3A%22goldengatebridge%22%2C%22xml_path%22%3A%22california%5C%2Fsanfrancisco%5C%2Fgoldengatebridge%22%2C%22liveon%22%3A%22true%22%2C%22archiveon%22%3A%22false%22%2C%22hofon%22%3A%22true%22%2C%22bestofon%22%3A%22false%22%2C%22timelapseon%22%3A%22false%22%2C%22playbackspeed%22%3A%22500%22%2C%22showdates%22%3A%22yes%22%2C%22width%22%3A%22640%22%2C%22height%22%3A%22480%22%2C%22actualwidth%22%3A%22640%22%2C%22actualheight%22%3A%22480%22%2C%22temptype%22%3A%22F%22%2C%22metar%22%3A%22KAUS%22%2C%22hofid%22%3A%22goldengatebridge%22%2C%22live_type%22%3A%22megapixel%22%2C%22wcs%22%3A%22656%22%2C%22timezone%22%3A%22America%5C%2FLos_Angeles%22%2C%22thumbimage%22%3A%22http%3A%5C%2F%5C%2Fstatic.earthcamcdn.com%5C%2Fcamshots%5C%2F128x72%5C%2Fa276d9cc3c626a69becdf8dbc2901b69.jpg%22%2C%22thumbimage2%22%3A%22http%3A%5C%2F%5C%2Fstatic.earthcamcdn.com%5C%2Fcamshots%5C%2F128x72%5C%2Fa276d9cc3c626a69becdf8dbc2901b69.jpg%22%2C%22alttext%22%3A%22Golden+Gate+Bridge%22%2C%22camtext%22%3A%22Cam+1%22%2C%22imagedomain%22%3A%22http%3A%5C%2F%5C%2Farchives.earthcam.com%22%2C%22streamingdomain%22%3A%22rtmp%3A%5C%2F%5C%2Fvideo2.earthcam.com%22%2C%22archivedomain%22%3A%22http%3A%5C%2F%5C%2Farchives.earthcam.com%22%2C%22timelapsedomain%22%3A%22http%3A%5C%2F%5C%2Farchives.earthcam.com%22%2C%22filedomain%22%3A%22http%3A%5C%2F%5C%2Fwww.earthcam.com%5C%2Fswf%5C%2Fcam_player%5C%2F%22%2C%22livepath%22%3A%22%5C%2Farchives5%5C%2Fecnetwork%5C%2Fus%5C%2Fca%5C%2Fsanfrancisco%5C%2Fcaltransdmpr3-3%5C%2Flive.jpg%22%2C%22livestreamingpath%22%3A%22%5C%2Ffecnetwork%5C%2F%22%2C%22archivepath%22%3A%22%22%2C%22timelapsepath%22%3A%22%22%2C%22windowsmediapath%22%3A%22%22%2C%22hofpath%22%3A%22california%5C%2Fgoldengatebridge%5C%2F%22%2C%22logopath%22%3A%22%5C%2Fcams%5C%2Fcalifornia%5C%2Fsanfrancisco%5C%2Fgoldengatebridge%5C%2Fimages%5C%2Fgoldengate.swf%22%2C%22livestreamingbuffer%22%3A%225%22%2C%22archivebuffer%22%3A%225%22%2C%22timelapsebuffer%22%3A%225%22%2C%22name%22%3A%22Golden+Gate+Bridge%22%2C%22group%22%3A%22California+Cams%22%2C%22location%22%3A%22San+Francisco%2C+California%22%2C%22description%22%3A%22%3Cspan+class%3D%27desc%27%3EEarthCam+brings+you+to+the+glorious+and+iconic+Golden+Gate+Bridge+in+San+Francisco%2C+California.+%5Cu00a0Constructed+in+1937%2C+the+bridge+--+with+its+%5C%22golden%5C%22+orange-colored+exterior+--+is+the+second-broadest+bridge+in+the+U.S.%2C+its+total+length+spanning+1.7+miles.%3C%5C%2Fspan%3E%22%7D%7D%7D&json2=&path=/cams/california/goldengatebridge/&needWaterTemp=false&showplaceholder=false&ecnBlack=false&thumbLabel=&thumbLabel2=&eventMode=&startOnWorldTour=false&displayWorldTourGoogleAds=true"></iframe>
         </div>
-        <div class="quarter-panel">
-          <div class="overlay">NOTHING YET</div>
-          <video src="static.mp4" autoplay="autoplay" loop="loop"></video>
+-->
+				<div class="quarter-panel">
+          <div class="overlay">ESCAPE</div>
+<!--           <video src="static.mp4" autoplay="autoplay" loop="loop"></video> -->
+					<div id="playerVideoscapes"></div>
         </div>
         <div class="quarter-panel">
           <div class="overlay">NOTHING YET</div>
-          <video src="static.mp4" autoplay="autoplay" loop="loop"></video>
+<!--           <img src="http://dl.dropbox.com/u/994121/gifs/tumblr_lu0jf7dswk1qk3206o1_500.gif" width="100%" /> -->
         </div>
         <div class="quarter-panel">
           <div class="overlay">NOTHING YET</div>
-          <video src="static.mp4" autoplay="autoplay" loop="loop"></video>
+<!--           <img src="http://dl.dropbox.com/u/994121/gifs/eca08fcfa9c9c45b0965c097cbbe86d21bb6c272.gif" height="100%" /> -->
+        </div>
+        <div class="quarter-panel">
+          <div class="overlay">NOTHING YET</div>
         </div>
       </div>
       
